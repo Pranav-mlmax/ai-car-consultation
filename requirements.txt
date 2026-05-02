@@ -1,0 +1,11 @@
+flask
+flask-cors
+python-dotenv
+langchain==0.3.25
+langchain-community==0.3.23
+langchain-openai==0.3.16
+langchain-text-splitters==0.3.8
+langchain-huggingface
+chromadb
+sentence-transformers
+gunicorn

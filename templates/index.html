@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoAdvisor India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0c0e;
+      --surface: #131416;
+      --border: #1f2023;
+      --accent: #e8ff47;
+      --accent2: #ff6b35;
+      --text: #f0f0ee;
+      --muted: #6b6d72;
+      --card: #16181b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      min-height: calc(100vh - 73px);
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .sidebar-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .sidebar-title em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .sidebar-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-top: -20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    select, input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6d72' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--accent);
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    button#submitBtn {
+      background: var(--accent);
+      color: #0b0c0e;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+
+    button#submitBtn:hover { opacity: 0.88; transform: translateY(-1px); }
+    button#submitBtn:active { transform: translateY(0); }
+    button#submitBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .output-panel {
+      padding: 48px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+
+    .empty-state p { font-size: 0.88rem; max-width: 220px; line-height: 1.6; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .result-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .result-tag {
+      font-size: 0.7rem;
+      background: rgba(232, 255, 71, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(232, 255, 71, 0.25);
+      padding: 3px 10px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    #resultBox {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: #ccccc8;
+    }
+
+    #resultBox strong, #resultBox b { color: var(--text); }
+
+    .loader {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 48px auto;
+    }
+
+    .loader.active { display: flex; }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 820px) {
+      main { grid-template-columns: 1fr; }
+      header { padding: 20px 24px; }
+      .sidebar { padding: 28px 24px; }
+      .output-panel { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Auto<span>Advisor</span> India</div>
+  <div class="badge">AI · RAG · 2026 Market</div>
+</header>
+
+<main>
+  <aside class="sidebar">
+    <div>
+      <h1 class="sidebar-title">Find your <em>perfect</em> car.</h1>
+      <p class="sidebar-sub" style="margin-top:10px">Tell us what you need. We'll cut through the noise.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Budget (in Lakhs)</label>
+      <input type="number" id="budget" placeholder="e.g. 10" min="3" max="50" />
+    </div>
+
+    <div class="grid2">
+      <div class="form-group">
+        <label>Car Type</label>
+        <select id="body_type">
+          <option value="">Any</option>
+          <option>Hatchback</option>
+          <option>SUV</option>
+          <option>Sedan</option>
+          <option>MPV</option>
+          <option>Electric</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fuel Type</label>
+        <select id="fuel">
+          <option value="">Any</option>
+          <option>Petrol</option>
+          <option>Diesel</option>
+          <option>Electric</option>
+          <option>CNG</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="form-group">
+        <label>Primary Use</label>
+        <select id="usage">
+          <option value="">Any</option>
+          <option>City</option>
+          <option>Highway</option>
+          <option>Mixed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Seats Needed</label>
+        <select id="seats">
+          <option value="">Any</option>
+          <option>5</option>
+          <option>7</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="form-group">
+        <label>Top Priority</label>
+        <select id="priority">
+          <option value="">Any</option>
+          <option>Mileage</option>
+          <option>Safety</option>
+          <option>Features</option>
+          <option>Performance</option>
+          <option>Value</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Brand Preference</label>
+        <select id="brand">
+          <option value="">Any</option>
+          <option>Maruti</option>
+          <option>Hyundai</option>
+          <option>Kia</option>
+          <option>Honda</option>
+          <option>Toyota</option>
+          <option>Tata</option>
+          <option>Mahindra</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="submitBtn" onclick="getRecommendation()">Get Recommendations →</button>
+  </aside>
+
+  <section class="output-panel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🚗</div>
+      <p>Fill in your preferences and hit the button to get your top 3 picks.</p>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <span>Consulting the market data...</span>
+    </div>
+
+    <div id="resultContainer" style="display:none">
+      <div class="result-header">
+        <h2>Your Top Picks</h2>
+        <span class="result-tag">AI Generated</span>
+      </div>
+      <div id="resultBox"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  async function getRecommendation() {
+    const preferences = {
+      budget: document.getElementById("budget").value + " lakhs",
+      body_type: document.getElementById("body_type").value,
+      fuel: document.getElementById("fuel").value,
+      usage: document.getElementById("usage").value,
+      seats: document.getElementById("seats").value,
+      priority: document.getElementById("priority").value,
+      brand: document.getElementById("brand").value,
+    };
+
+    if (!preferences.budget || preferences.budget === " lakhs") {
+      alert("Please enter your budget.");
+      return;
+    }
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    document.getElementById("emptyState").style.display = "none";
+    document.getElementById("resultContainer").style.display = "none";
+    document.getElementById("loader").classList.add("active");
+
+    try {
+      const res = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preferences }),
+      });
+
+      const data = await res.json();
+      document.getElementById("resultBox").textContent = data.recommendation;
+      document.getElementById("resultContainer").style.display = "block";
+    } catch {
+      alert("Something went wrong. Please try again.");
+      document.getElementById("emptyState").style.display = "flex";
+    } finally {
+      document.getElementById("loader").classList.remove("active");
+      btn.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>
