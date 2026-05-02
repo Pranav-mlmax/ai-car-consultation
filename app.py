@@ -2,10 +2,6 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from market_data import MARKET_DATA
@@ -24,20 +20,14 @@ llm = ChatOpenAI(
     max_tokens=2048
 )
 
-docs = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(
-    [Document(page_content=MARKET_DATA)]
-)
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-retriever = Chroma.from_documents(docs, embeddings).as_retriever(search_kwargs={"k": 3})
-
 prompt = ChatPromptTemplate.from_template("""
 You are a senior Indian car consultant with deep knowledge from Team-BHP, r/CarsIndia and r/IndianCarsUnder10Lakhs communities.
 
 Customer Profile:
 {user_summary}
 
-Verified Market Data:
-{rag_context}
+Indian Car Market Data (2026):
+{market_data}
 
 Instructions:
 - Budget is in INR. If given in lakhs convert it (e.g. 12 lakhs = 12,00,000 INR).
@@ -59,11 +49,8 @@ def index():
 def recommend():
     data = request.json
     prefs = data.get("preferences", {})
-
     user_summary = "\n".join([f"{k}: {v}" for k, v in prefs.items()])
-    rag_context = "\n".join([d.page_content for d in retriever.invoke(prefs.get("body_type", "") + " " + prefs.get("budget", ""))])
-
-    result = chain.invoke({"user_summary": user_summary, "rag_context": rag_context})
+    result = chain.invoke({"user_summary": user_summary, "market_data": MARKET_DATA})
     return jsonify({"recommendation": result})
 
 
